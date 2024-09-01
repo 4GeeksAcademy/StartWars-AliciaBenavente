@@ -36,7 +36,7 @@ export const PeopleView = (props) => {
 					<div className="card bg-secondary mt-5" style={{width: "90%", color: "white"}}>
 					<div className="row g-0">
 						<div className="col-md-4">
-							<img src={rigoImage} className="img-fluid rounded-start" alt="..."/>
+							<img src="https://starwars-visualguide.com/assets/img/characters/1.jpg" className="img-fluid rounded-start" alt="..."/>
 						</div>
 						<div className="col-md-8">
 						<div className="card-body">
@@ -76,12 +76,12 @@ export const PeopleView = (props) => {
 						</tbody>
 						</table>
 						
+				</body>
 				<Link to="/">
 					<span className="btn btn-primary btn-lg" href="#" role="button">
 						Back home
 					</span>
 				</Link>
-				</body>
 			</>
 		);
 

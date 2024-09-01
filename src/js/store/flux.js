@@ -17,83 +17,127 @@ const getState = ({ getStore, getActions, setStore }) => {
 					initial: "white"
 				}
 			],
+			
+			// uniqueCharacter: [],
 			characters: [],
 			starships: [],
 			planets: [],
+			favorites: [],
 			
 		},
 		actions: {
 			
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
+			addFavorite: (name) => {
+                const store = getStore();
+                const favorites = store.favorites.includes(name)
+                    ? store.favorites.filter((item) => item !== name)
+                    : [...store.favorites, name];
+                setStore({ favorites });
+            },
+
+
+			// addFavorite: (name) => {
+			// 	const store = getStore();
+				
+			// 	if(store.favorites.includes(name)){
+			// 		console.log("está el elemento");
+			// 		setStore({favorites: store.favorites.filter((favorite)=> favorite != name)})
+			// 	} else {
+			// 		setStore({favorites: [...store.favorites, name]})
+			// 	}
+			// },
+			deleteFavorite: (index) => {
+				const store = getStore();
+				const updatedFavorites = store.favorites.filter((_, i) => i !== index);
+                setStore({ favorites: updatedFavorites });
 			},
 
-			// getCharacter: () => {
-			// const [ properties, setProperties ] = useState("")
-			// const [character, setCharacter] = useState("");
-			// const params = useParams();
-			// console.log(params);
+			loadCharacterTest: (characterId) => {
+				fetch(`https://www.swapi.tech/api/people/${characterId}`)
+				.then((response) => response.json())
+				.then((data) => data.result.properties)
+			}
+			,
 
-			// fetch("https://www.swapi.tech/api/people/" + params.people_id)
-			// .then((response)=> response.json())
-			// .then((data)=> {
-			// 	console.log(data.result.properties);
-			// 	if(data.result && data.result.properties) {
-			// 	setCharacter(data.result)
-			// 	setProperties(data.result.properties)
-			// 	}})
-			// .catch((error)=> console.error("Error", error))},
-
-			// getCharacter: () => {
-			// 	fetch("https://www.swapi.tech/api/people/")
-			// 	.then((response)=> {
-			// 		if(!response.ok) {console.error("Error fetching character", error);
-			// 		} else {return response.json()}})
-			// 	.then((data)=> {})
-			// 	.catch((error)=> console.error("Error fetching characters:", error))
-			// },
-
-			// getCharacter: () => {
-			// 	fetch("https://www.swapi.tech/api/people/")
-			// 	.then((response)=> response.json())
-			// 	.then((data)=> {
-			// 		const characterInfo = data.results;
-			// 		const characterPromise = characterInfo.map(result=> {
-			// 			const characterID = result.uid;
-			// 			return fetch(`https://www.swapi.tech/api/people/${characterID}`)
-			// 			.then((response)=> response.json())
-			// 			.then((characterProperties)=> characterProperties.result)
-			// 		})
-			// 	Promise.all(characterPromise)
-			// 	.then(characters => {
-			// 		characters.sort((a, b) => a.uid - b.uid);
-			// 		setStore({ characters });
-			// 	})
-			// 	.catch((error => {
-			// 		console.error("Error fetching characters 1:", error)}))
 			
-			// })
-			// 	.catch((error => {
-			// 		console.error("Error fetching characters 2:", error)}))
-			// },
+			loadCharacters: async () => {
+                try {
+                    const response = await fetch('https://www.swapi.tech/api/people/');
+                    const data = await response.json();
+                    const results = data.results;
 
+                    const characters = [];
+                    for (const result of results) {
+                        const characterId = result.uid;
+                        const characterResponse = await fetch(`https://www.swapi.tech/api/people/${characterId}`);
+                        const characterData = await characterResponse.json();
+                        characters.push(characterData.result);
+                    }
+                    setStore({ characters });
+                    // localStorage.setItem('characters', JSON.stringify(characters)); 
+                } catch (error) {
+                    console.error("Error fetching characters:", error);
+                }
+            },
+
+			characterByID: () => {
+				// const store = getStore()
+				fetch(`https://www.swapi.tech/api/people/`)
+				.then((response) => response.json())
+				.then((data) => { 
+					const characterPromises = data.result.map((character) =>
+					{return fetch(character.url)
+						.then((response) => response.json())
+						.then((details) => ({
+							uid: details.result.uid,
+							name: details.result.properties.name,
+							gender: details.result.properties.gender,
+							hair_color: details.result.properties.hair_color,
+							eye_color: details.result.properties.eye_color,
+						}))
+					})
+					return Promise.all(characterPromises)
+					})
+					.then((characters) => {
+						dispatcher.dispatch({
+							type: "SET_CHARACTERS",
+							payload: characters,
+						})})
+					.catch((error) => console.error("Error fetching character properties", error))
+				},
+			
+
+			// characterByID: (uid) => {
+			// // const store = getStore()
+			// fetch(`https://www.swapi.tech/api/people/${uid}`)
+			// .then((response) => response.json())
+			// .then((data) => { 
+			// 	return data.result.properties, 
+			// 	console.log("Character properties",data.result.properties)})
+			// 	.catch((error) => console.error("Error fetching character properties", error))
+			// },
+			
 
 			loadInitialData: () => {
-				
-				fetch("https://www.swapi.tech/api/people/")
-				.then((response)=> response.json())
-				.then((data)=> setStore({ characters: data.results }))
-				.catch((error)=> console.error("Error", error))
-
-				fetch("https://www.swapi.tech/api/starships/")
-				.then((response)=> response.json())
-				.then((data)=> setStore({ starships: data.results }))
-				.catch((error)=> console.error("Error", error))
-
-				fetch("https://www.swapi.tech/api/planets/")
-				.then((response)=> response.json())
-				.then((data)=> setStore({ planets: data.results }))
-				.catch((error)=> console.error("Error", error))
+							
+			// const store = getStore();
+			// fetch("https://www.swapi.tech/api/people/")
+			// .then((response)=> response.json())
+			// .then((data)=> setStore({ characters: data.results }),
+			// 	console.log(store.characters)
+			// )
+			// .catch((error)=> console.error("Error", error))
+			
+			
+			// fetch("https://www.swapi.tech/api/starships/")
+			// .then((response)=> response.json())
+			// .then((data)=> setStore({ starships: data.results }))
+			// .catch((error)=> console.error("Error", error))
+			
+			// fetch("https://www.swapi.tech/api/planets/")
+			// .then((response)=> response.json())
+			// .then((data)=> setStore({ planets: data.results }))
+			// .catch((error)=> console.error("Error", error))
 				
 			},
 			changeColor: (index, color) => {

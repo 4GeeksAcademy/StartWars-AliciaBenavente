@@ -12,7 +12,9 @@ import "../../styles/home.css";
 
 export const Home = () => {
 	const { store, actions } = useContext(Context);
-
+	useEffect(()=>{
+        actions.loadCharacters()
+     },[])
 
 	return (
 		<>
@@ -21,16 +23,17 @@ export const Home = () => {
 			<h1 className="text-primary mt-5 mb-4">Characters</h1>
 			<div className="row" style={{overflowX:"scroll"}}>
 				<div className="characters d-inline-flex mb-5">
-
-
-					{store.characters.map((character)=> <Character 
-					name={character.name} 
-					key={character.uid}
-					// gender={character.properties.gender}
-                        // hair_color={character.properties.hair_color}
-                        // eye_color={character.properties.eye_color}
-                    uid={character.uid}
-						/>)}
+					{store.characters.map((character, index)=> (
+					<div key={index}>
+						<Character 
+						name={character.properties.name} 
+						uid={character.uid}
+						gender={character.properties.gender}
+						hair_color={character.properties.hair_color}
+						eye_color={character.properties.eye_color}
+						/>
+						</div>
+					))}
 				</div>
 
 			</div>
