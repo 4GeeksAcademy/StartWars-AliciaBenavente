@@ -12,29 +12,12 @@ export const Character = (props) => {
     const [ colorChange , setColorChange ] = useState(false);
     const isFavorite = store.favorites.includes(props.name);
    
-    // const buttonStyle = {
-    //     border: `1px solid ${colorChange ? 'yellow' : 'red'}`,
-    //     background: 'transparent',
-    //     cursor: 'pointer',
-    // };
 
     const changeColor = () => {
-        // event.stopPropagation();
         setColorChange(true)
         actions.addFavorite(props.name);
     };
 
-    // const changeColor = () => {
-        
-    //     if(colorChange === false) {
-    //         setColorChange(true)
-    //         actions.addFavorite(props.name)
-    //     } 
-    //     else {
-    //         setColorChange(false)
-    //     }
-    // };
-    
 
     return(
         <div className="characterCard me-4">

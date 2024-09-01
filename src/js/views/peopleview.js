@@ -7,7 +7,7 @@ import "../../styles/peopleView.css";
 
 
 
-export const PeopleView = (props) => {
+export const PeopleView = () => {
 	const { store, actions } = useContext(Context);
 	const [ properties, setProperties ] = useState("")
 	const [character, setCharacter] = useState("");
@@ -36,7 +36,7 @@ export const PeopleView = (props) => {
 					<div className="card bg-secondary mt-5" style={{width: "90%", color: "white"}}>
 					<div className="row g-0">
 						<div className="col-md-4">
-							<img src="https://starwars-visualguide.com/assets/img/characters/1.jpg" className="img-fluid rounded-start" alt="..."/>
+							<img src={`https://starwars-visualguide.com/assets/img/characters/${character.uid}.jpg`} className="img-fluid rounded-start" alt="Loading..."/>
 						</div>
 						<div className="col-md-8">
 						<div className="card-body">

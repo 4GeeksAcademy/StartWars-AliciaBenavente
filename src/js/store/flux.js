@@ -18,7 +18,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			],
 			
-			// uniqueCharacter: [],
 			characters: [],
 			starships: [],
 			planets: [],
