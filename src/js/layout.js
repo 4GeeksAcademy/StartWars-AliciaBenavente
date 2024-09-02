@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import ScrollToTop from "./component/scrollToTop";
 
 import { PeopleView } from "./views/peopleview";
-import { PlanetsView } from "./views/planetsview";
+import { PlanetView } from "./views/planetview";
 import { StarshipView } from "./views/starshipview";
 import { Home } from "./views/home";
 import { Demo } from "./views/demo";
@@ -31,7 +31,7 @@ const Layout = () => {
 						<Route path="/" element={<Home />} />
 						<Route path="/demo" element={<Demo />} />
 						<Route path="/peopleView/:people_id" element={<PeopleView />} />
-						<Route path="/planetsView/:planet_id" element={<PlanetsView />} />
+						<Route path="/planetsView/:planet_id" element={<PlanetView />} />
 						<Route path="/starshipsView/:starship_id" element={<StarshipView />} />
 						<Route path="/single/:theid" element={<Single />} />
 						<Route path="*" element={<h1>Not found!</h1>} />

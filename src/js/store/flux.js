@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import { useParams } from "react-router";
-import { Character } from "../component/character";
 
 const getState = ({ getStore, getActions, setStore }) => {
+	const storedCharacters = JSON.parse(localStorage.getItem('characters')) || [];
+    const storedPlanets = JSON.parse(localStorage.getItem('planets')) || [];
+    const storedStarships = JSON.parse(localStorage.getItem('starships')) || [];
+	
 	return {
 		store: {
 			demo: [
@@ -18,9 +19,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			],
 			
-			characters: [],
-			starships: [],
-			planets: [],
+			characters: storedCharacters,
+			starships: storedStarships,
+			planets: storedPlanets,
 			favorites: [],
 			
 		},
@@ -34,31 +35,13 @@ const getState = ({ getStore, getActions, setStore }) => {
                 setStore({ favorites });
             },
 
-
-			// addFavorite: (name) => {
-			// 	const store = getStore();
-				
-			// 	if(store.favorites.includes(name)){
-			// 		console.log("está el elemento");
-			// 		setStore({favorites: store.favorites.filter((favorite)=> favorite != name)})
-			// 	} else {
-			// 		setStore({favorites: [...store.favorites, name]})
-			// 	}
-			// },
 			deleteFavorite: (index) => {
 				const store = getStore();
 				const updatedFavorites = store.favorites.filter((_, i) => i !== index);
                 setStore({ favorites: updatedFavorites });
 			},
 
-			loadCharacterTest: (characterId) => {
-				fetch(`https://www.swapi.tech/api/people/${characterId}`)
-				.then((response) => response.json())
-				.then((data) => data.result.properties)
-			}
-			,
 
-			
 			loadCharacters: async () => {
                 try {
                     const response = await fetch('https://www.swapi.tech/api/people/');
@@ -73,87 +56,52 @@ const getState = ({ getStore, getActions, setStore }) => {
                         characters.push(characterData.result);
                     }
                     setStore({ characters });
-                    // localStorage.setItem('characters', JSON.stringify(characters)); 
+                    localStorage.setItem('characters', JSON.stringify(characters)); 
                 } catch (error) {
                     console.error("Error fetching characters:", error);
                 }
             },
 
-			characterByID: () => {
-				// const store = getStore()
-				fetch(`https://www.swapi.tech/api/people/`)
-				.then((response) => response.json())
-				.then((data) => { 
-					const characterPromises = data.result.map((character) =>
-					{return fetch(character.url)
-						.then((response) => response.json())
-						.then((details) => ({
-							uid: details.result.uid,
-							name: details.result.properties.name,
-							gender: details.result.properties.gender,
-							hair_color: details.result.properties.hair_color,
-							eye_color: details.result.properties.eye_color,
-						}))
-					})
-					return Promise.all(characterPromises)
-					})
-					.then((characters) => {
-						dispatcher.dispatch({
-							type: "SET_CHARACTERS",
-							payload: characters,
-						})})
-					.catch((error) => console.error("Error fetching character properties", error))
-				},
-			
+			loadStarships: async () => {
+                try {
+                    const response = await fetch('https://www.swapi.tech/api/starships/');
+                    const data = await response.json();
+                    const results = data.results;
 
-			// characterByID: (uid) => {
-			// // const store = getStore()
-			// fetch(`https://www.swapi.tech/api/people/${uid}`)
-			// .then((response) => response.json())
-			// .then((data) => { 
-			// 	return data.result.properties, 
-			// 	console.log("Character properties",data.result.properties)})
-			// 	.catch((error) => console.error("Error fetching character properties", error))
-			// },
-			
+                    const starships = [];
+                    for (const result of results) {
+                        const starshipId = result.uid;
+                        const starshipResponse = await fetch(`https://www.swapi.tech/api/starships/${starshipId}`);
+                        const starshipData = await starshipResponse.json();
+                        starships.push(starshipData.result);
+                    }
+                    setStore({ starships });
+                    localStorage.setItem('starships', JSON.stringify(starships)); 
+                } catch (error) {
+                    console.error("Error fetching starships:", error);
+                }
+            },
 
-			loadInitialData: () => {
-							
-			// const store = getStore();
-			// fetch("https://www.swapi.tech/api/people/")
-			// .then((response)=> response.json())
-			// .then((data)=> setStore({ characters: data.results }),
-			// 	console.log(store.characters)
-			// )
-			// .catch((error)=> console.error("Error", error))
-			
-			
-			// fetch("https://www.swapi.tech/api/starships/")
-			// .then((response)=> response.json())
-			// .then((data)=> setStore({ starships: data.results }))
-			// .catch((error)=> console.error("Error", error))
-			
-			// fetch("https://www.swapi.tech/api/planets/")
-			// .then((response)=> response.json())
-			// .then((data)=> setStore({ planets: data.results }))
-			// .catch((error)=> console.error("Error", error))
-				
-			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
+			loadPlanets: async () => {
+                try {
+                    const response = await fetch('https://www.swapi.tech/api/planets/');
+                    const data = await response.json();
+                    const results = data.results;
 
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
-
-				//reset the global store
-				setStore({ demo: demo });
-			}
-		}
+                    const planets = [];
+                    for (const result of results) {
+                        const planetId = result.uid;
+                        const planetResponse = await fetch(`https://www.swapi.tech/api/planets/${planetId}`);
+                        const planetData = await planetResponse.json();
+                        planets.push(planetData.result);
+                    }
+                    setStore({ planets });
+                    localStorage.setItem('planets', JSON.stringify(planets)); 
+                } catch (error) {
+                    console.error("Error fetching starships:", error);
+                }
+            },	
+		},
 	};
 };
 
