@@ -9,14 +9,12 @@ export const PeopleView = () => {
 	const [ properties, setProperties ] = useState("")
 	const [character, setCharacter] = useState("");
 	const  params = useParams();
-	console.log(params);
 	
 	useEffect(()=> {
 
 			fetch("https://www.swapi.tech/api/people/" + params.people_id)
 			.then((response)=> response.json())
 			.then((data)=> {
-				console.log(data.result.properties);
 				if(data.result && data.result.properties) {
 				setCharacter(data.result)
 				setProperties(data.result.properties)

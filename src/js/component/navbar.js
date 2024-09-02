@@ -11,22 +11,30 @@ export const Navbar = () => {
 	const [ inputValue, setInputValue ] = useState ("");
 	const [ suggestion, setSuggestion ] = useState([])
 	const [ highlightedIndex, setHighlightedIndex ] = useState(-1);
-	const findCharacter = store.characters.find(character=> character.properties.name)
-	const findStarship = store.starships.find(starship=> starship.properties.name)
-	const findPlanet = store.planets.find(planet=> planet.properties.name)
+	const filteredSuggestions = suggestion.filter(suggestion => 
+		suggestion.properties.name.startsWith(inputValue.toUpperCase())
+	);
 
 	const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
-            Search(inputValue);
+            if (highlightedIndex >= 0) {
+                navigateToItem(filteredSuggestions[highlightedIndex]);
+            } else {
+				alert("This is not the result you are looking for...");
+			}
         } else if (event.key === "ArrowDown") {
-			setHighlightedIndex((prevIndex) => Math.min(prevIndex + 1, suggestion.length - 1))
-		} else if (event.key === "ArrowUp") {
-			setHighlightedIndex((prevIndex) => Math.max(prevIndex - 1, -1));
-		}
-    };
+            setHighlightedIndex(prevIndex => 
+                prevIndex < filteredSuggestions.length - 1 ? prevIndex + 1 : prevIndex // Aumentar solo si no es el último
+            );
+        } else if (event.key === "ArrowUp") {
+            setHighlightedIndex(prevIndex => 
+                prevIndex > 0 ? prevIndex - 1 : -1 
+            );
+        }
+	};
 
 	const handleSuggestionClick = (value) => {
-		setInputValue(value.properties.name); // Set input value to the selected suggestion
+		setInputValue(value.properties.name); 
 		navigateToItem(value);
 	};
 
@@ -36,9 +44,9 @@ export const Navbar = () => {
 		setHighlightedIndex(-1);
 
 		const filteredSuggestions = [
-			...store.characters.filter(character => character.properties.name.includes(value)),
-			...store.starships.filter(starship => starship.properties.name.includes(value)),
-			...store.planets.filter(planet => planet.properties.name.includes(value))
+			...store.characters.filter(character => character.properties.name.toLowerCase().startsWith(value) || character.properties.name.toUpperCase().startsWith(value)),
+			...store.starships.filter(starship => starship.properties.name.toLowerCase().startsWith(value) || starship.properties.name.toUpperCase().startsWith(value)),
+			...store.planets.filter(planet => planet.properties.name.toLowerCase().startsWith(value) || planet.properties.name.toUpperCase().startsWith(value))
 		]
 		setSuggestion(filteredSuggestions);
 		if(value.trim() === "") {
@@ -46,46 +54,36 @@ export const Navbar = () => {
 		}
 	};
 
-	const Search = (item) => {
-		const foundItem = suggestion.find(s => s.properties.name === item);
+	const search = (item) => {
+		const foundItem = suggestion.find(s => s.properties.name.toLowerCase() === item);
 		if (foundItem) {
 			navigateToItem(foundItem);
 		} else {
 			alert("This is not the result you are looking for...");
 		};
+	};
 
-		const navigateToItem = (item) => {
-		if (findCharacter === item) {
-			console.log(findCharacter)
-			navigate(`/peopleView/${findCharacter.uid}`)
-			console.log(item.uid)
-			console.log(findCharacter)
-		} else if (findStarship === item) {
-			navigate(`/starshipsView/${findStarship.uid}`)
-		} else if (findPlanet === item) {
-			navigate(`/planetsView/${findPlanet.uid}`)
-		} else {
-			return (
-				// <ToastContainer
-				// position="top-center"
-				// autoClose={5000}
-				// hideProgressBar={false}
-				// newestOnTop={false}
-				// closeOnClick
-				// rtl={false}
-				// theme="dark"
-				
-				// />
-				alert("This is not the result you are looking for...")
-			)
-		}
-	}}
+	const navigateToItem = (item) => {
+        if (!item) return;
+
+        if (store.characters.some(character => character.uid === item.uid)) {
+            navigate(`/peopleView/${item.uid}`);
+        } else if (store.starships.some(starship => starship.uid === item.uid)) {
+            navigate(`/starshipsView/${item.uid}`);
+        } else if (store.planets.some(planet => planet.uid === item.uid)) {
+            navigate(`/planetsView/${item.uid}`);
+        } else {
+            alert("This is not the result you are looking for...");
+        }
+    };
+
 
 	return (
 		<nav className="navbar bg-dark sticky-top mb-3 justify-content-around">
 			<Link to="/">
 				<img className="navbar-brand mb-0" width={100} height={"auto"} src={"https://i.pinimg.com/originals/c7/7c/11/c77c11c6c03ff5c4f2d250e893ca615f.png"}></img>
 			</Link>
+
 
 {/* input styled */}
 			<div className="grid"></div>
@@ -108,12 +106,14 @@ export const Navbar = () => {
 				value={inputValue} />
 				{suggestion.length > 0 && (
 						<ul className={`dropdown-menu dropdown-menu-dark ${suggestion.length > 0 ? 'show' : ''}`}>
-							{suggestion.map((value, index) => (
-								<li className="dropdown-item bg-body-secondary-subtle" key={index}
+							{suggestion.map((item, index) => (
+								<li className={`dropdown-item ${highlightedIndex === index ? 'active' : ''}`}
+								key={index}
 								style={{ cursor: 'pointer' }}
+								onChange={handleKeyDown}
 								onKeyDown={handleKeyDown}
-								onClick={() => handleSuggestionClick(value)}>
-									{value.properties.name}
+								onClick={() => handleSuggestionClick(item)}>
+									{item.properties.name}
 								</li>
 							))}
 						</ul>
@@ -139,7 +139,7 @@ export const Navbar = () => {
 					></path>
 				</svg>
 				</div>
-				<div id="search-icon" onClick={() => Search(inputValue)}>
+				<div id="search-icon" onClick={() => search(inputValue)}>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					width="24"

@@ -2,8 +2,6 @@ import React, { useState, useEffect, useContext } from "react";
 import PropTypes from "prop-types";
 import { Link, useParams } from "react-router-dom";
 import { Context } from "../store/appContext";
-import rigoImage from "../../img/rigo-baby.jpg";
-
 
 
 export const StarshipView = () => {
@@ -24,7 +22,6 @@ export const StarshipView = () => {
 			fetch("https://www.swapi.tech/api/starships/" + params.starship_id)
 			.then((response)=> response.json())
 			.then((data)=> {
-				console.log(data.result.properties);
 				if(data.result && data.result.properties) {
 				setStarship(data.result)
 				setProperties(data.result.properties)
@@ -34,7 +31,7 @@ export const StarshipView = () => {
 
 		return (
 			<>
-			<body className="bg-dark">
+			
 				<div className="row justify-content-evenly">
 					<div className="card bg-secondary mt-5" style={{width: "90%", color: "white"}}>
 					<div className="row g-0">
@@ -87,7 +84,6 @@ export const StarshipView = () => {
 						</tbody>
 						</table>
 						
-				</body>
 				<Link to="/">
 					<span className="btn btn-primary btn-lg" href="#" role="button">
 						Back home
